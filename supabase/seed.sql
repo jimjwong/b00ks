@@ -1,0 +1,10 @@
+-- Local development seed data.
+--
+-- Supabase creates auth.users via the Auth API, not raw SQL, so this file
+-- intentionally does not insert fake users. After signing up locally
+-- (e.g. via the web app's /register page), you can use the Supabase Studio
+-- SQL editor to insert sample books/collections against your real user id,
+-- or run the fixture script described in docs/setup/local-development.md.
+--
+-- Kept deliberately empty of business data: no commercial book content,
+-- copyrighted metadata, or production secrets belong in this file.

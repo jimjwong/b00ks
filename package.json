@@ -1,0 +1,25 @@
+{
+  "name": "b00ks",
+  "private": true,
+  "version": "0.1.0",
+  "description": "b00ks — your books, every device.",
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.20.0",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json}\" --ignore-unknown",
+    "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\" --ignore-unknown"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "prettier": "^3.3.3",
+    "turbo": "^2.1.3",
+    "typescript": "^5.6.3"
+  }
+}

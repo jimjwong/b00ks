@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "b00ks",
+    "slug": "b00ks",
+    "scheme": "b00ks",
+    "version": "0.1.0",
+    "orientation": "default",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.b00ks.mobile"
+    },
+    "android": {
+      "package": "app.b00ks.mobile",
+      "adaptiveIcon": {
+        "backgroundColor": "#fdfbf7"
+      }
+    },
+    "plugins": ["expo-router", "expo-secure-store"],
+    "extra": {
+      "router": {
+        "origin": false
+      }
+    }
+  }
+}
