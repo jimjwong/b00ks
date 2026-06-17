@@ -1,5 +1,3 @@
-import type { NextConfig } from "next";
-
 // 'unsafe-inline' on script-src is a temporary baseline until nonce-based CSP
 // is wired through Next.js middleware (tracked in TASKS.md, Phase 10).
 const securityHeaders = [
@@ -22,7 +20,7 @@ const securityHeaders = [
   },
 ];
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   reactStrictMode: true,
   transpilePackages: [
     "@b00ks/api",

@@ -1,3 +1,4 @@
+import React from "react";
 import Link from "next/link";
 
 const benefits = [
@@ -31,10 +32,16 @@ export default function LandingPage() {
         </p>
         <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
           <Link
-            href="/register"
+            href="/login"
             className="rounded-md bg-accent-500 px-6 py-3 text-sm font-medium text-paper-50 transition-colors hover:bg-accent-600"
           >
-            Create your library
+            Login
+          </Link>
+          <Link
+            href="/register"
+            className="rounded-md border border-accent-500 px-6 py-3 text-sm font-medium text-accent-700 transition-colors hover:bg-paper-100"
+          >
+            Register
           </Link>
           <Link
             href="#how-it-works"

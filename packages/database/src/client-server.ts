@@ -20,7 +20,7 @@ export function createSupabaseServerClient(
   return createServerClient<Database>(url, anonKey, {
     cookies: {
       getAll: () => cookies.getAll(),
-      setAll: (list) => cookies.setAll(list),
+      setAll: (list: Parameters<CookieAdapter["setAll"]>[0]) => cookies.setAll(list),
     },
   });
 }

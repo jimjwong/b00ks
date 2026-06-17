@@ -7,6 +7,14 @@ const PROTECTED_PREFIXES = ["/library", "/book", "/collections", "/highlights", 
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next({ request });
 
+  const isProtected = PROTECTED_PREFIXES.some((prefix) => request.nextUrl.pathname.startsWith(prefix));
+
+  if (!publicEnv.supabaseUrl || !publicEnv.supabaseAnonKey) {
+    // Supabase isn't configured yet (e.g. fresh local checkout). Don't crash
+    // every request over it — public pages still need to render.
+    return response;
+  }
+
   const supabase = createSupabaseServerClient(publicEnv.supabaseUrl, publicEnv.supabaseAnonKey, {
     getAll: () => request.cookies.getAll(),
     setAll: (list) => {
@@ -20,7 +28,6 @@ export async function middleware(request: NextRequest) {
   // signed in without forcing a manual re-login.
   const { data } = await supabase.auth.getUser();
 
-  const isProtected = PROTECTED_PREFIXES.some((prefix) => request.nextUrl.pathname.startsWith(prefix));
   if (isProtected && !data.user) {
     const redirectUrl = new URL("/login", request.url);
     redirectUrl.searchParams.set("next", request.nextUrl.pathname);

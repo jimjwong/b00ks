@@ -1,7 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "@b00ks/database";
 
-type Client = SupabaseClient<Database>;
+type Client = Pick<SupabaseClient, "auth">;
 
 /**
  * Thin, framework-agnostic wrapper around Supabase Auth. Accepts whichever
