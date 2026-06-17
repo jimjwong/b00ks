@@ -5,6 +5,7 @@ import type { FormEvent } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createAuthService } from "@b00ks/auth";
+import { publicEnv } from "@/lib/env";
 import { getSupabaseBrowserClient } from "@/lib/supabase/browser";
 
 type AuthMode = "login" | "register";
@@ -26,7 +27,11 @@ export function AuthForm({ mode }: AuthFormProps) {
   const nextPath = getSafeNext(searchParams.get("next"));
   const callbackError = searchParams.get("error");
   const isRegister = mode === "register";
-  const auth = useMemo(() => createAuthService(getSupabaseBrowserClient()), []);
+  const hasSupabaseConfig = Boolean(publicEnv.supabaseUrl && publicEnv.supabaseAnonKey);
+  const auth = useMemo(
+    () => (hasSupabaseConfig ? createAuthService(getSupabaseBrowserClient()) : null),
+    [hasSupabaseConfig],
+  );
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,8 +44,15 @@ export function AuthForm({ mode }: AuthFormProps) {
     setMessage(null);
     setError(null);
 
+    if (!auth) {
+      setError("Supabase is not configured for this deployment. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in Vercel, then redeploy.");
+      setIsSubmitting(false);
+      return;
+    }
+    const authClient = auth!;
+
     const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
-    const { error: googleError } = await auth.signInWithGoogle(redirectTo);
+    const { error: googleError } = await authClient.signInWithGoogle(redirectTo);
 
     if (googleError) {
       setError(googleError.message);
@@ -54,9 +66,16 @@ export function AuthForm({ mode }: AuthFormProps) {
     setMessage(null);
     setError(null);
 
+    if (!auth) {
+      setError("Supabase is not configured for this deployment. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in Vercel, then redeploy.");
+      setIsSubmitting(false);
+      return;
+    }
+    const authClient = auth!;
+
     const result = isRegister
-      ? await auth.signUp(email, password, `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`)
-      : await auth.signInWithPassword(email, password);
+      ? await authClient.signUp(email, password, `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`)
+      : await authClient.signInWithPassword(email, password);
 
     if (result.error) {
       setError(result.error.message);
@@ -102,7 +121,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         <button
           type="button"
           onClick={signInWithGoogle}
-          disabled={isSubmitting}
+          disabled={isSubmitting || !hasSupabaseConfig}
           className="flex w-full items-center justify-center rounded-md border border-charcoal-300 px-4 py-3 text-sm font-medium text-charcoal-800 transition-colors hover:bg-paper-100 disabled:cursor-not-allowed disabled:opacity-60"
         >
           Continue with Google
@@ -142,6 +161,14 @@ export function AuthForm({ mode }: AuthFormProps) {
             />
           </label>
 
+          {!hasSupabaseConfig ? (
+            <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
+              Supabase is not configured for this deployment. Set
+              <code> NEXT_PUBLIC_SUPABASE_URL </code> and
+              <code> NEXT_PUBLIC_SUPABASE_ANON_KEY </code> in Vercel, then redeploy.
+            </p>
+          ) : null}
+
           {error ? <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
           {message ? <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">{message}</p> : null}
 
@@ -155,7 +182,7 @@ export function AuthForm({ mode }: AuthFormProps) {
 
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !hasSupabaseConfig}
             className="rounded-md bg-accent-500 px-6 py-3 text-sm font-medium text-paper-50 transition-colors hover:bg-accent-600 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSubmitting ? "Please wait…" : isRegister ? "Register with email" : "Log in with email"}
