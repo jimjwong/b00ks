@@ -21,6 +21,18 @@ function getSafeNext(value: string | null) {
   return value;
 }
 
+function isLocalOrigin(origin: string) {
+  return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+}
+
+function getAuthCallbackUrl(nextPath: string) {
+  const configuredOrigin = publicEnv.appUrl.replace(/\/$/, "");
+  const runtimeOrigin = window.location.origin;
+  const appOrigin = configuredOrigin && !isLocalOrigin(configuredOrigin) ? configuredOrigin : runtimeOrigin;
+
+  return `${appOrigin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
+}
+
 export function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -51,7 +63,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     }
     const authClient = auth!;
 
-    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
+    const redirectTo = getAuthCallbackUrl(nextPath);
     const { error: googleError } = await authClient.signInWithGoogle(redirectTo);
 
     if (googleError) {
@@ -74,7 +86,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     const authClient = auth!;
 
     const result = isRegister
-      ? await authClient.signUp(email, password, `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`)
+      ? await authClient.signUp(email, password, getAuthCallbackUrl(nextPath))
       : await authClient.signInWithPassword(email, password);
 
     if (result.error) {
